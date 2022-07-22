@@ -13,6 +13,42 @@ app = Dash(server=server, external_stylesheets=external_stylesheets)
 
 # app.config['SESSION_TYPE'] = 'memcached'
 
+app.index_string = '''<!DOCTYPE html>
+<html>
+<head>
+<title>My app title</title>
+<link rel="manifest" href="./assets/manifest.json" />
+{%metas%}
+{%favicon%}
+{%css%}
+</head>
+<script type="module">
+   import 'https://cdn.jsdelivr.net/npm/@pwabuilder/pwaupdate';
+   const el = document.createElement('pwa-update');
+   document.body.appendChild(el);
+</script>
+<body>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', ()=> {
+      navigator
+      .serviceWorker
+      .register('./assets/sw01.js')
+      .then(()=>console.log("Ready."))
+      .catch(()=>console.log("Err..."));
+    });
+  }
+</script>
+{%app_entry%}
+<footer>
+{%config%}
+{%scripts%}
+{%renderer%}
+</footer>
+</body>
+</html>
+'''
+
 app.layout = html.Div([
     dcc.Textarea(
         id='textarea-example',
@@ -21,22 +57,6 @@ app.layout = html.Div([
     ),
     html.Div(id='textarea-example-output', style={'whiteSpace': 'pre-line'})
 ])
-
-# @app.callback(
-#     Output('textarea-example-output', 'children'),
-#     Input('textarea-example', 'value')
-# )
-# def update_output(value):
-#     print('start call back')
-#     print(f"this is session {session.get('my_sess', None)}")
-#     if not session.get('my_sess'):
-#         session['my_sess'] = 4332
-#     else:
-#         session['my_sess'] = value
-#
-#     # return 'You have entered: \n{}'.format(value)
-#     return 'You have entered: \n\n\n\n\n{}'.format(session.get('my_sess', 'None'))
-
 
 app.layout = html.Div([
     html.Div(dcc.Input(id='input-box', type='text')),
@@ -56,7 +76,7 @@ def update_output(n_clicks, value):
     else:
         session['my_sess'] = 'new'
 
-    return f'This {session["my_sess"]}'
+    return f'This session is {session["my_sess"]}'
 
 
 
